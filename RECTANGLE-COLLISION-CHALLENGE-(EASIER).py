@@ -12,9 +12,11 @@ RED = (255, 0, 0)
 import random
 global Mouse_Click_X,Mouse_Click_Y
 
-Mouse_Click_X = 0
-Mouse_Click_Y = 0
+Mouse_Clicked = 0
+Mouse_Click_Hit = 0
 objectarray = []
+text = f"clicks: 0 || Hits: 0 || acurracy: 0"
+
 
 def make_obj():
     for num in range(15):
@@ -28,10 +30,11 @@ def make_obj():
 class Obj:
     def __init__(self, type, D1,D2):
         self.type = type
-        self.xV = random.randint(0,1)
-        self.yV = random.randint(0,1)
+        self.xV = random.randint(1,3)
+        self.yV = random.randint(1,3)
         self.D1 = D1
         self.D2 = D2
+        self.hit = 0
         self.x = random.randint(0,1000)
         self.y = random.randint(0,1000)
         print(f"Obj Created: Type:{self.type}  VX: {self.xV} VY: {self.yV} D1: {self.D1} D2: {self.D2}\n")
@@ -44,34 +47,36 @@ class Obj:
             if self.x + self.D1 > size[0]:
                 var = (self.x + self.D1) - size[0]
                 self.x -= var
-                self.xV = -1 * self.xV
+                self.xV = -1 * self.xV 
             elif self.x - self.D1 < 0:
-                var = (self.x + self.D1)
-                self.x += var
+                var = (self.x - self.D1)
+                self.x -= var
                 self.xV = -1 * self.xV
+
             if self.y + self.D1 > size[1]:
                 var = (self.y + self.D1) - size[1]
                 self.y -= var
                 self.yV = -1 * self.yV
             elif self.y - self.D1 < 0:
-                var = (self.y + self.D1)
-                self.y += var
+                var = (self.y - self.D1)
+                self.y -= var
                 self.yV = -1 * self.yV
+
         elif self.type == "rect":
-            if self.x + (self.D1/2) < 0:
+            if self.x - (self.D1/2) < 0:
                 var = self.x - (self.D1/2)
-                self.x += var
+                self.x -= var
                 self.xV = -1 * self.xV
-            elif self.x + (self.D1/2) > size[0]:
-                var = self.x + (self.D1/2) - size[0]
+            elif self.x  > size[0]:
+                var = self.x - size[0]
                 self.x -= var
                 self.xV = -1 * self.xV
             if self.y - (self.D2/2) < 0:
-                var = self.y + (self.D2/2)
-                self.y += var
+                var = self.y - (self.D2/2)
+                self.y -= var
                 self.yV = -1 * self.yV
-            elif self.y - (self.D2/2) > size[1]:
-                var = self.y + (self.D2/2) - size[1]
+            elif self.y > size[1]:
+                var = self.y - size[1]
                 self.y -= var
                 self.yV = -1 * self.yV
                 
@@ -87,32 +92,11 @@ class Obj:
             else:
                 return 0
         elif self.type == "rect":
-            if self.x + self.D1 > coordinates[0] and self.x - self.D1 < coordinates[0] and self.y + self.D2 > coordinates[1] and self.y - self.D2 < coordinates[1]:
+            if self.x - self.D1/2 < coordinates[0] and self.x > coordinates[0] and self.y - self.D2/2 < coordinates[1] and self.y > coordinates[1]:
                 return False
+            else:
+                return 0
 
-
-# def on_move(x, y):
-#     print("Mouse moved to ({0}, {1})".format(x, y))
-
-# def on_click(x, y, button, pressed):
-#     if pressed:
-#         print('Mouse clicked at ({0}, {1}) with {2}'.format(x, y, button))
-#         test(x,y)
-#     else:
-#         print('Mouse released at ({0}, {1}) with {2}'.format(x, y, button))
-
-
-# def test(x,y):
-#     Mouse_Click_X = x
-#     Mouse_Click_Y = y
-
-
-
-# # Setup the listener thread
-# mouse_listener = MouseListener(on_move=on_move, on_click=on_click)
-# # Start the threads and join them so the script doesn't end early
-# mouse_listener.start()
-# mouse_listener.join()
 
 def actionDetection():
 
@@ -121,14 +105,22 @@ def actionDetection():
             print("User asked to quit.")
             pygame.quit()
             return True
+           
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos() 
+            print(mouse_pos)
             mouse_button = True
+            Mouse_Clicked += 1
+            text = f"clicks: {Mouse_Clicked} || Hits: {Mouse_Click_Hit} || acurracy: {Mouse_Click_Hit/Mouse_Clicked}"
+            print("mouse clicked")
+            mouse_found(mouse_pos)
         elif event.type == pygame.MOUSEBUTTONUP:
             mouse_button = False
-def mouseLocation_finder():
-    mouse_pos = pygame.mouse.get_pos() 
-    print(mouse_pos)
-    return mouse_pos
+
+def mouse_found(mouse_pos):
+    for item in objectarray:
+        if item.was_hit(mouse_pos) == 1:
+            item.hit = 1
 
 pygame.init()
  
@@ -152,6 +144,11 @@ while not done:
     done == actionDetection()  # Flag that we are done so we exit this loop   
     # --- Game logic should go here
     for item in objectarray:
+        if item.hit == False:
+            print("game over")
+        elif item.hit == 1:
+            objectarray.pop(objectarray.index(item))
+            Mouse_Click_Hit += 1
         item.movement()
         item.collision(size)
     # --- Screen-clearing code goes here
@@ -194,17 +191,17 @@ while not done:
     # # Draw an ellipse, using a rectangle as the outside boundaries
     # pygame.draw.ellipse(screen, BLACK, [20,20,250,100], 2)  
     # # Select the font to use, size, bold, italics
-    # font = pygame.font.SysFont('Calibri', 25, True, False)
+    font = pygame.font.SysFont('Calibri', 25, True, False)
     
-    # # Render the text. "True" means anti-aliased text.
-    # # Black is the color. The variable BLACK was defined
-    # # above as a list of [0, 0, 0]
-    # # Note: This line creates an image of the letters,
-    # # but does not put it on the screen yet.
-    # text = font.render("My text",True,BLACK)
+     # Render the text. "True" means anti-aliased text.
+     # Black is the color. The variable BLACK was defined
+     # above as a list of [0, 0, 0]
+     # Note: This line creates an image of the letters,
+     # but does not put it on the screen yet.
+    text = font.render(str(text),True,BLACK)
     
-    # # Put the image of the text on the screen at 250x250
-    # screen.blit(text, [250, 250])
+    # Put the image of the text on the screen at 250x250
+    screen.blit(text, [450, 10])
 
 
 
