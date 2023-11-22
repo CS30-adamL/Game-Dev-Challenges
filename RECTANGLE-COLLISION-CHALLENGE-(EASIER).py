@@ -27,7 +27,7 @@ def notdzero():
 # msg = f"clicks: {Mouse_Clicked} || Hits: {Mouse_Click_Hit} || acurracy: {Mouse_Click_Hit/Mouse_Clicked}"
 msg = f"clicks: {Mouse_Clicked} || Hits: {Mouse_Click_Hit} || acurracy: {notdzero()}"
  
-obj_num = 1500
+obj_num = 30
 
 # Making objects
 def make_obj():
