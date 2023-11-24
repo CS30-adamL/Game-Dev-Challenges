@@ -1,5 +1,3 @@
-
-
 import pygame
 import random
 # Define some colors
