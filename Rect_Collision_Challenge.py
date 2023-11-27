@@ -28,8 +28,8 @@ class Player:
     def __init__(self,x,y,w,h):
         self.x = x
         self.y = y
-        self.w = x + w
-        self.h = y - h
+        self.w = w
+        self.h = h
         self.xV = 5
         self.yV = 5
         self.hitting = False
@@ -38,13 +38,13 @@ class Player:
         # print(w,a,s,d,self.xV,self.yV)
         if w or a or s or d == True: 
             if a == True and d == False:
-                self.xV = -1
+                self.xV = -3
             elif a == False and d == True:
-                self.xV = 1
+                self.xV = 3
             if w == True and s == False:
-                self.yV = -1
-            if w == False and s == True:
-                self.yV = 1
+                self.yV = -3
+            elif w == False and s == True:
+                self.yV = 3
         else:
             self.xV = 0
             self.yV = 0
@@ -70,28 +70,29 @@ class Player:
     #             self.y -= var
     #             #disable movent up
     def collision_Player(self,wall):
-        if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h:
-            if self.x + (self.w) > wall.x:
+         if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h:
+            if self.xV > 0:
+                self.xV = 0
                 var = self.x + (self.w) - wall.x
                 self.x -= var
+                
+            elif self.xV < 0:
                 self.xV = 0
-            elif self.x  > wall.x + wall.w:
-                var = self.x - wall.x + wall.w
-                self.x -= var
-                self.xV = 0
+                var = self.x - (wall.x + wall.w)
+                self.x -= var 
                 #disable movent left
-            if self.y - (self.h) > wall.y:
-                var = (self.y - (self.h)) -wall.y
-                self.y -= var
-                self.yV = 0
-                #disable movent down
-            elif self.y > wall.y - wall.h:
-                var = self.y - wall.y - wall.h
-                self.y -= var
-                self.yV = 0
-                #disable movent up
-         
-
+            # if self.y - (self.h) > wall.y:
+            #     var = (self.y - (self.h)) + wall.y
+            #     self.y -= var
+            #     self.yV = 0
+            #     #disable movent up
+            # elif self.y > wall.y - wall.h:
+            #     var = self.y - wall.y - wall.h
+            #     self.y -= var
+            #     self.yV = 0
+            #     #disable movent up
+        
+# self.x > (wall.x + wall.w) and (self.x + self.w) < wall.x
 class Obj:
     def __init__(self,x,y,w,h):
         self.x = x #random.randint(0,1000)
@@ -169,8 +170,8 @@ while not done:
     done == actionDetection()  # Flag that we are done so we exit this loop   
     # --- Game logic should go here
     print(player.x,player.xV,player.y,player.yV)
-    player.x + player.xV
-    player.y + player.yV
+    player.x += player.xV
+    player.y += player.yV
     player.movement(w_pressed,a_pressed,s_pressed,d_pressed)
     for item in objectarray:
         item.collision_Wall(size)
@@ -181,7 +182,7 @@ while not done:
 
     # --- Drawing code should go here
     for item in objectarray:
-            pygame.draw.rect(screen,RED,[item.x - (item.w), item.y - (item.h),(item.w),(item.h)],0)
+            pygame.draw.rect(screen,RED,[item.x, item.y,(item.w),(item.h)],0)
     pygame.draw.rect(screen,BLACK,[player.x,player.y,player.w,player.h],0)
    
     # --- Go ahead and update the screen with what we've drawn.
