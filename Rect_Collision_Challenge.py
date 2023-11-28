@@ -37,62 +37,59 @@ class Player:
     def movement(self,w,a,s,d):
         # print(w,a,s,d,self.xV,self.yV)
         if w or a or s or d == True: 
-            if a == True and d == False:
-                self.xV = -3
-            elif a == False and d == True:
-                self.xV = 3
+            if a == True and d == False :
+                self.xV = -5
+                self.yV = 0
+            if a == False and d == True:
+                self.xV = 5
+                self.yV = 0
             if w == True and s == False:
-                self.yV = -3
-            elif w == False and s == True:
-                self.yV = 3
+                self.yV = -5
+                self.xV = 0
+            if w == False and s == True:
+                self.yV = 5
+                self.xV = 0
         else:
             self.xV = 0
             self.yV = 0
         vals = [self.xV,self.yV]
         return vals
     
-
-    # def collision_Player(self,wall):
-    #         if self.x + (self.w) > wall.x and self.x  < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h:
-    #             var = self.x + (self.w) - wall.x
-    #             self.x -= var
-    #             #disable movent right
-    #         elif self.x  > wall.x + wall.w:
-    #             var = self.x - wall.x + wall.w
-    #             self.x -= var
-    #             #disable movent left
-    #         if self.y - (self.h) > wall.y:
-    #             var = (self.y - (self.h)) -wall.y
-    #             self.y -= var
-    #             #disable movent down
-    #         elif self.y > wall.y - wall.h:
-    #             var = self.y - wall.y - wall.h
-    #             self.y -= var
-    #             #disable movent up
-    def collision_Player(self,wall):
-         if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h:
+    def collision_Wall(self,size):
+            if self.x - (self.w) < 0:
+                var = self.x - (self.w)
+                self.x -= var
+            elif self.x  > size[0]:
+                var = self.x - size[0]
+                self.x -= var
+            if self.y - (self.h) < 0:
+                var = self.y - (self.h)
+                self.y -= var
+            elif self.y > size[1]:
+                var = self.y - size[1]
+                self.y -= var
+    
+    def collision_Player(self,wall,tp):
+        if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h and tp == True:
+            tp_mode()
+        if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h and tp == False:
             if self.xV > 0:
                 self.xV = 0
                 var = self.x + (self.w) - wall.x
-                self.x -= var
-                
+                self.x -= var               
             elif self.xV < 0:
                 self.xV = 0
                 var = self.x - (wall.x + wall.w)
                 self.x -= var 
-                #disable movent left
-            # if self.y - (self.h) > wall.y:
-            #     var = (self.y - (self.h)) + wall.y
-            #     self.y -= var
-            #     self.yV = 0
-            #     #disable movent up
-            # elif self.y > wall.y - wall.h:
-            #     var = self.y - wall.y - wall.h
-            #     self.y -= var
-            #     self.yV = 0
-            #     #disable movent up
+            if self.yV < 0:
+                var = self.y - (wall.y + wall.h)
+                self.y -= var
+                self.yV = 0
+            elif self.yV > 0:
+                var = self.y + self.h - wall.y
+                self.y -= var
+                self.yV = 0
         
-# self.x > (wall.x + wall.w) and (self.x + self.w) < wall.x
 class Obj:
     def __init__(self,x,y,w,h):
         self.x = x #random.randint(0,1000)
@@ -117,13 +114,10 @@ class Obj:
                 var = self.y - size[1]
                 self.y -= var
     
-    
-    def was_hit(self, coordinates):
-            if self.x - self.w < coordinates[0] and self.x > coordinates[0] and self.y - self.h < coordinates[1] and self.y > coordinates[1]:
-                self.hitting = "Game_over"
-            else:
-                self.hitting = "not_hit"
 
+def tp_mode():
+    player.x = 0
+    player.y = 0
 
 def actionDetection():
     global w_pressed,a_pressed,s_pressed,d_pressed
@@ -159,7 +153,11 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("My Game")
 player = Player(100,100,20,20)
 make_obj(400,500,50,50)
+make_obj(200,600,90,50)
+for i in range(0,10):
+    make_obj(random.randint(50,750),random.randint(50,750),random.randint(10,100),random.randint(10,100))
 done = False
+tp = False
 
 clock = pygame.time.Clock()
 # -------- Main Program Loop -----------
@@ -170,12 +168,14 @@ while not done:
     done == actionDetection()  # Flag that we are done so we exit this loop   
     # --- Game logic should go here
     print(player.x,player.xV,player.y,player.yV)
+    player.movement(w_pressed,a_pressed,s_pressed,d_pressed)
     player.x += player.xV
     player.y += player.yV
-    player.movement(w_pressed,a_pressed,s_pressed,d_pressed)
+
     for item in objectarray:
         item.collision_Wall(size)
-        player.collision_Player(item)
+        player.collision_Player(item,tp)
+        player.collision_Wall(size)
         
     # --- Screen-clearing code goes here
     screen.fill(WHITE)
