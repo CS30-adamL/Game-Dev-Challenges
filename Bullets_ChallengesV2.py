@@ -8,7 +8,7 @@ RED = (255, 0, 0)
 pygame.init()
 objectarray = []
 bulletarray = []
-obj_num = 30
+obj_num = 50
 size = (1000, 800)
 done = False
 screen = pygame.display.set_mode(size)
@@ -31,6 +31,7 @@ class Player:
         self.r = r
         self.x = 400
         self.y = size[1] - 50
+        self.dir = "Up"
         print(f"player Created: X:{self.x} R:{self.r}")
 
     def collision(self,size):
@@ -42,33 +43,49 @@ class Player:
                 self.x -= var
     def shoot(self):
         print("shot")
-        bullet = Bullet(5,self.x,self.y)
+        bullet = Bullet(5,self.x,self.y,self.dir)
         bulletarray.append(bullet)
 
-    def movement(self,a,d):
-        if a == True and d == False:
+    def movement(self,a,d,w,s):
+        if w or a or s or d == True: 
+            if a == True and d == False :
                 self.xV = -5
-        elif a == False and d == True:
+                self.yV = 0
+                self.dir = "Left"
+            if a == False and d == True:
                 self.xV = 5
-        elif a== False and d == False:
+                self.yV = 0
+                self.dir = "Right"
+            if w == True and s == False:
+                self.yV = -5
+                self.xV = 0
+                self.dir = "Up"
+            if w == False and s == True:
+                self.yV = 5
+                self.xV = 0
+                self.dir = "Down"
+        else:
             self.xV = 0
-        self.x += self.xV
+            self.yV = 0
 
 
 
 class Bullet:
-    def __init__(self, r,x,y):
-        self.xV = 0
-        self.yV = -5
+    def __init__(self, r,x,y,dir):
+        self.dir = dir
+        self.xV = 5
+        self.yV = 5
         self.r = r
         self.hit = False
         self.miss = False
         self.x = x
         self.y = y
 
-    def offScreen(self):
-        if self.y < 0:
+    def offScreen(self,size):
+        if self.y < 0 or self.y > size[1] or self.x < 0 or self.x > size[0]:
             self.miss = True
+
+
     
     def bullet_hit(self,item):
             did_it_hit = item.was_shot(self.x,self.y,self.r)
@@ -76,7 +93,15 @@ class Bullet:
                 self.hit = True
             return did_it_hit
     def movement(self):
-        self.y += self.yV
+        if self.dir == "Right":
+            self.x += self.xV
+        elif self.dir == "Left":
+            self.x -= self.xV
+        elif self.dir == "Up":
+            self.y -= self.yV
+        elif self.dir == "Down":
+            self.y += self.yV
+
     
 # Making objects
 def make_obj():
@@ -88,7 +113,6 @@ class Obj:
         self.xV = random.randint(1,3)
         self.yV = random.randint(1,3)
         self.r = r
-        self.hit = "not_hit"
         self.x = random.randint(0,1000)
         self.y = random.randint(0,1000)
         print(f"Obj Created:   VX: {self.xV} VY: {self.yV} r: {self.r} \n")
@@ -106,8 +130,8 @@ class Obj:
                 self.x -= var
                 self.xV = -1 * self.xV
 
-            if self.y + self.r > size[1]/2:
-                var = (self.y + self.r) - size[1]/2
+            if self.y + self.r > size[1]:
+                var = (self.y + self.r) - size[1]
                 self.y -= var
                 self.yV = -1 * self.yV
             elif self.y - self.r < 0:
@@ -120,10 +144,8 @@ class Obj:
             dy = self.y - playery
             distance = (dx * dx + dy * dy)**0.5
             if distance - player_r < self.r:
-                self.hit = "dead"
                 return True
             else:
-                self.hit = "alive"
                 return False
        
 def actionDetection():
@@ -173,9 +195,10 @@ while not done:
     done == actionDetection() 
     # --- Game logic should go here
     mouse_pos = pygame.mouse.get_pos() 
-    player.movement(a_pressed,d_pressed)
+    player.movement(a_pressed,d_pressed,w_pressed,s_pressed)
     player.collision(size)
-
+    player.x += player.xV
+    player.y += player.yV
     for item in objectarray:
         item.collision(size)
         item.movement()
@@ -186,7 +209,7 @@ while not done:
         if bullet.hit == True:
                 bulletarray.pop(bulletarray.index(bullet))
         bullet.movement()   
-        bullet.offScreen()         
+        bullet.offScreen(size)         
         for item in objectarray:
             hit = bullet.bullet_hit(item)
             if hit == True:
