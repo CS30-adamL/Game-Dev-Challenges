@@ -41,6 +41,12 @@ class Player:
             elif self.x - self.r < 0:
                 var = (self.x - self.r)
                 self.x -= var
+            if self.y + self.r > size[1]:
+                var = (self.y + self.r) - size[1]
+                self.y -= var
+            elif self.y - self.r < 0:
+                var = (self.y - self.r)
+                self.y -= var
     def shoot(self):
         print("shot")
         bullet = Bullet(5,self.x,self.y,self.dir)
@@ -196,9 +202,9 @@ while not done:
     # --- Game logic should go here
     mouse_pos = pygame.mouse.get_pos() 
     player.movement(a_pressed,d_pressed,w_pressed,s_pressed)
-    player.collision(size)
     player.x += player.xV
     player.y += player.yV
+    player.collision(size)
     for item in objectarray:
         item.collision(size)
         item.movement()
