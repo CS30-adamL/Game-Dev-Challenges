@@ -200,7 +200,6 @@ while not done:
     # --- Main event loop
     done == actionDetection() 
     # --- Game logic should go here
-    mouse_pos = pygame.mouse.get_pos() 
     player.movement(a_pressed,d_pressed,w_pressed,s_pressed)
     player.x += player.xV
     player.y += player.yV
