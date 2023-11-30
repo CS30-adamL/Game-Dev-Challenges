@@ -21,7 +21,6 @@ s_pressed = False
 d_pressed = False
 # Making objects
 def make_obj():
-    
     for num in range(obj_num):
         num = Obj(random.randint(10,30))
         objectarray.append(num)
@@ -42,6 +41,12 @@ class Player:
             elif self.x - self.r < 0:
                 var = (self.x - self.r)
                 self.x -= var
+            if self.y + self.r > size[1]:
+                var = (self.y + self.r) - size[1]
+                self.y -= var
+            elif self.y - self.r < 0:
+                var = (self.y - self.r)
+                self.y -= var
     def shoot(self,mouse_pos):
         print("shot")
         bullet = Bullet(5,self.x,self.y,mouse_pos)
@@ -70,8 +75,6 @@ class Player:
             self.xV = 0
             self.yV = 0
 
-
-
 class Bullet:
     def __init__(self, r,x,y,dir):
         self.dir = dir
@@ -79,16 +82,13 @@ class Bullet:
         self.yV = 5
         self.r = r
         self.hit = False
-        self.miss = False
         self.x = x
         self.y = y
 
     def offScreen(self,size):
         if self.y < 0 or self.y > size[1] or self.x < 0 or self.x > size[0]:
-            self.miss = True
+            self.hit = True
 
-
-    
     def bullet_hit(self,item):
             did_it_hit = item.was_shot(self.x,self.y,self.r)
             if did_it_hit == True:
@@ -98,25 +98,15 @@ class Bullet:
     def movement(self):
         dx =  self.dir[0]- self.x
         dy =  self.dir[1] - self.y
+        dist = (dx**2 + dy**2)**0.5
         angle = math.atan2(dy,dx)
-        self.xV = 5 * abs(math.cos(angle))
-        self.yV = 5 * abs(math.sin(angle))
-        # dx = (self.x - self.dir[0])*2
-        # dy = (self.y - self.dir[1])*2
-        # angle = math.atan2(dy,dx)
-        # self.xV = 5 * math.cos(angle)
-        # self.yV = 5 * math.sin(angle)
+        self.xV = 5 * math.cos(angle)
+        self.yV = 5 * math.sin(angle)
         self.x += self.xV
         self.y += self.yV
-
-    def velo_cal(self):
-        dx =  self.dir[0]- self.x
-        dy =  self.dir[1] - self.y
-        angle = math.atan2(dy,dx)
-        if angle < 0 
-        self.xV = 5 * abs(math.cos(angle))
-        self.yV = 5 * abs(math.sin(angle))
-
+        if dist < 150:
+            self.dir[0] += self.xV*10
+            self.dir[1] += self.yV*10
 # Making objects
 def make_obj():
     for num in range(obj_num):
@@ -134,6 +124,7 @@ class Obj:
     def movement(self):
         self.x += self.xV
         self.y += self.yV
+
     def collision(self,size):
             if self.x + self.r > size[0]:
                 var = (self.x + self.r) - size[0]
@@ -143,7 +134,6 @@ class Obj:
                 var = (self.x - self.r)
                 self.x -= var
                 self.xV = -1 * self.xV
-
             if self.y + self.r > size[1]:
                 var = (self.y + self.r) - size[1]
                 self.y -= var
@@ -170,7 +160,7 @@ def actionDetection():
             pygame.quit()
             return True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos() 
+            mouse_pos = list(pygame.mouse.get_pos())
             print(mouse_pos)
             mouse_button = True
             print("mouse clicked")
@@ -208,18 +198,17 @@ while not done:
     # --- Main event loop
     done == actionDetection() 
     # --- Game logic should go here
-    mouse_pos = pygame.mouse.get_pos() 
+    
     player.movement(a_pressed,d_pressed,w_pressed,s_pressed)
-    player.collision(size)
     player.x += player.xV
     player.y += player.yV
+    player.collision(size)
     for item in objectarray:
-        item.collision(size)
-        item.movement()
-        
+            item.movement()
+            item.collision(size)
+            
     for bullet in bulletarray:
-        if bullet.miss == True:
-                bulletarray.pop(bulletarray.index(bullet))
+        print(len(bulletarray))
         if bullet.hit == True:
                 bulletarray.pop(bulletarray.index(bullet))
         bullet.movement()   
@@ -228,6 +217,7 @@ while not done:
             hit = bullet.bullet_hit(item)
             if hit == True:
                 objectarray.pop(objectarray.index(item))
+                
     if len(objectarray) == 0:
         print("WIN!")
         make_obj()
@@ -248,16 +238,3 @@ while not done:
  
 # Close the window and quit.
 pygame.quit()
-
-
-#  for item in objectarray:
-#         for bullet in bulletarray:
-#             if bullet.miss == True:
-#                 bulletarray.pop(bulletarray.index(bullet))
-#             if bullet.hit == True:
-#                 bulletarray.pop(bulletarray.index(bullet))
-#             bullet.movement()                
-#             bullet.bullet_hit(item)
-#         if item.hit == "dead":
-#             dead_food = objectarray.pop(objectarray.index(item))
-#         item.collision(size)
