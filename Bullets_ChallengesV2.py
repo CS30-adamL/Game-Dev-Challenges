@@ -83,13 +83,12 @@ class Bullet:
         self.yV = 5
         self.r = r
         self.hit = False
-        self.miss = False
         self.x = x
         self.y = y
 
     def offScreen(self,size):
         if self.y < 0 or self.y > size[1] or self.x < 0 or self.x > size[0]:
-            self.miss = True
+            self.hit = True
 
 
     
@@ -162,13 +161,8 @@ def actionDetection():
             pygame.quit()
             return True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos() 
-            print(mouse_pos)
-            mouse_button = True
             print("mouse clicked")
             player.shoot()
-        elif event.type == pygame.MOUSEBUTTONUP:
-            mouse_button = False
         elif event.type == pygame.KEYDOWN:
             if pygame.key.name(event.key) == "w":
                 w_pressed = True
@@ -207,18 +201,17 @@ while not done:
     for item in objectarray:
         item.collision(size)
         item.movement()
-        
+
     for bullet in bulletarray:
-        if bullet.miss == True:
-                bulletarray.pop(bulletarray.index(bullet))
+        print(len(bulletarray))
         if bullet.hit == True:
                 bulletarray.pop(bulletarray.index(bullet))
         bullet.movement()   
         bullet.offScreen(size)         
         for item in objectarray:
-            hit = bullet.bullet_hit(item)
-            if hit == True:
+            if bullet.bullet_hit(item) == True:
                 objectarray.pop(objectarray.index(item))
+
     if len(objectarray) == 0:
         print("WIN!")
         make_obj()
@@ -239,16 +232,3 @@ while not done:
  
 # Close the window and quit.
 pygame.quit()
-
-
-#  for item in objectarray:
-#         for bullet in bulletarray:
-#             if bullet.miss == True:
-#                 bulletarray.pop(bulletarray.index(bullet))
-#             if bullet.hit == True:
-#                 bulletarray.pop(bulletarray.index(bullet))
-#             bullet.movement()                
-#             bullet.bullet_hit(item)
-#         if item.hit == "dead":
-#             dead_food = objectarray.pop(objectarray.index(item))
-#         item.collision(size)

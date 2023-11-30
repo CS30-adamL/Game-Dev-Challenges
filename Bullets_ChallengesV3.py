@@ -31,7 +31,6 @@ class Player:
         self.r = r
         self.x = 400
         self.y = size[1] - 50
-        self.dir = "Up"
         print(f"player Created: X:{self.x} R:{self.r}")
 
     def collision(self,size):
@@ -56,19 +55,14 @@ class Player:
         if w or a or s or d == True: 
             if a == True and d == False :
                 self.xV = -5
-                self.yV = 0
-                self.dir = "Left"
             elif a == False and d == True:
                 self.xV = 5
-                self.dir = "Right"
             else:
                 self.xV = 0
             if w == True and s == False:
                 self.yV = -5
-                self.dir = "Up"
             elif w == False and s == True:
                 self.yV = 5
-                self.dir = "Down"
             else:
                 self.yV = 0
         else:
@@ -214,8 +208,7 @@ while not done:
         bullet.movement()   
         bullet.offScreen(size)         
         for item in objectarray:
-            hit = bullet.bullet_hit(item)
-            if hit == True:
+            if bullet.bullet_hit(item) == True:
                 objectarray.pop(objectarray.index(item))
                 
     if len(objectarray) == 0:
