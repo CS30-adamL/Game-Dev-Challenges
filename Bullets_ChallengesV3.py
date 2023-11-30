@@ -82,7 +82,7 @@ class Bullet:
         self.miss = False
         self.x = x
         self.y = y
-    
+
     def offScreen(self,size):
         if self.y < 0 or self.y > size[1] or self.x < 0 or self.x > size[0]:
             self.miss = True
@@ -96,22 +96,27 @@ class Bullet:
             return did_it_hit
     
     def movement(self):
-        dx = self.x - self.dir[0]
-        dy = self.y - self.dir[1]
-        distance = (dx * dx + dy * dy)**0.5
-        # angle = math.acos(dx/distance)
-        # if distance > self.r:
-        
-        if dx > 0:
-            self.x += self.xV * (dx/dy)
-        elif dx < 0:
-            self.x -= self.xV * (dx/dy)
-        if dy < 0:
-            self.y -= self.yV * (dy/dx)
-        elif dy > 0:
-            self.y += self.yV * (dy/dx)
+        dx =  self.dir[0]- self.x
+        dy =  self.dir[1] - self.y
+        angle = math.atan2(dy,dx)
+        self.xV = 5 * abs(math.cos(angle))
+        self.yV = 5 * abs(math.sin(angle))
+        # dx = (self.x - self.dir[0])*2
+        # dy = (self.y - self.dir[1])*2
+        # angle = math.atan2(dy,dx)
+        # self.xV = 5 * math.cos(angle)
+        # self.yV = 5 * math.sin(angle)
+        self.x += self.xV
+        self.y += self.yV
 
-    
+    def velo_cal(self):
+        dx =  self.dir[0]- self.x
+        dy =  self.dir[1] - self.y
+        angle = math.atan2(dy,dx)
+        if angle < 0 
+        self.xV = 5 * abs(math.cos(angle))
+        self.yV = 5 * abs(math.sin(angle))
+
 # Making objects
 def make_obj():
     for num in range(obj_num):
