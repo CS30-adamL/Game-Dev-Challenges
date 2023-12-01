@@ -15,6 +15,7 @@ w_pressed = False
 a_pressed = False
 s_pressed = False
 d_pressed = False
+space_pressed = False
 objectarray = []
 
 obj_num = 30
@@ -72,45 +73,14 @@ class Player:
             tp_mode()
        
         if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h and tp == False:
-            # if self.x + self.w >= wall.x and self.x <= wall.x:
-            #     collision['left'] = True
-            #     self.xV = 0
-            #     var = self.x - (wall.x + wall.w)
-            #     self.x += var 
-            # elif self.x <= wall.x + wall.w and self.x + self.w >= wall.x:
-            #     collision['right'] = True
-            #     self.xV = 0
-            #     var = self.x + (self.w) - wall.x
-            #     self.x -= var     
-            # if self.y + self.h >= wall.y and self.y <= wall.y + wall.h:
-            #     collision['top'] = True
-            #     var = self.y - (wall.y + wall.h)
-            #     print(f"p.bs {self.y + (self.h)} w.ts {wall.y}   var {var}  symbol p.bs >= w.ts vy {self.yV}")
-            #     self.y -= var
-            #     self.yV = 0
-            # elif self.y <= wall.y + wall.h:
-            #     collision['bottom'] = True
-            #     var = self.y + self.h - wall.y
-            #     self.y -= var
-            #     self.yV = 0
-
-
-
-
-
-
-
-
-
-
             collision = {'top': False, 'bottom': False,'right': False,'left': False}
-            if self.y + self.h >= wall.y and self.y < wall.y:
+            if self.y + self.h > wall.y and self.y < wall.y:
                 collision['top'] = True
-            elif self.y + self.h <= wall.y and self.y >= wall.y + wall.h:
+            elif self.y < wall.y + wall.h and self.y + self.h > wall.y + wall.h + self.h/2:
                 collision['bottom'] = True
             if self.x + self.w > wall.x and self.x < wall.x - self.w/2:
                 collision['left'] = True
-            elif self.x < wall.x + wall.w and self.x + self.w  > wall.x + wall.h + self.w/2:
+            elif self.x < wall.x + wall.w and self.x + self.w  > wall.x + wall.w + self.w/2:
                 collision['right'] = True
             
 
@@ -162,7 +132,7 @@ def tp_mode():
     player.y = 0
 
 def actionDetection():
-    global w_pressed,a_pressed,s_pressed,d_pressed
+    global w_pressed,a_pressed,s_pressed,d_pressed,space_pressed
     for event in pygame.event.get(): # User did something
         if event.type == pygame.QUIT: # If user clicked close
             print("User asked to quit.")
@@ -177,6 +147,8 @@ def actionDetection():
                 s_pressed = True
             if pygame.key.name(event.key) == "d":
                 d_pressed = True
+            if pygame.key.name(event.key) == "space":
+                space_pressed = True
             print("User pressed a key.")
         elif event.type == pygame.KEYUP:
             if pygame.key.name(event.key) == "w":
@@ -187,6 +159,8 @@ def actionDetection():
                 s_pressed = False
             if pygame.key.name(event.key) == "d":
                 d_pressed = False
+            if pygame.key.name(event.key) == "space":
+                space_pressed = False
             print("User let go of a key.")
 
 pygame.init()
@@ -196,7 +170,7 @@ pygame.display.set_caption("My Game")
 player = Player(size[0]/2,size[1]/2,20,20)
 # make_obj(100,00,50,1000)
 # make_obj(900,00,50,1000)
-# make_obj(0,600,1000,50)
+make_obj(0,750,1000,100)
 # make_obj(0,200,1000,50)
 make_obj(500,400,200,200)
 # for i in range(0,10):
