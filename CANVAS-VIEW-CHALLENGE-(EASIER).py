@@ -17,9 +17,9 @@ s_pressed = False
 d_pressed = False
 space_pressed = False
 objectarray = []
-
+gravity = .1
 obj_num = 30
-
+collision = {'top': False, 'bottom': False,'right': False,'left': False}
 # Making objects
 def make_obj(x,y,w,h):
         num = Obj(x,y,w,h)
@@ -32,27 +32,29 @@ class Player:
         self.w = w
         self.h = h
         self.xV = 5
-        self.yV = 5
+        self.yV = 0
         self.hitting = False
     
-    def movement(self,w,a,s,d):
+    def movement(self,w,a,s,d,space):
         # print(w,a,s,d,self.xV,self.yV)
-        if w or a or s or d == True: 
+        if w or a or s or d or space== True: 
             if a == True and d == False :
                 self.xV = -5
             elif a == False and d == True:
                 self.xV = 5
             else:
                 self.xV = 0
-            if w == True and s == False:
-                self.yV = -5
-            elif w == False and s == True:
-                self.yV = 5
-            else:
-                self.yV = 0
+            if space == True and collision['top'] == True:
+                self.yV -= 5
+            # if w == True and s == False:
+            #     self.yV = -5
+            # elif w == False and s == True:
+            #     self.yV = 5
+            # else:
+            #     self.yV = 0
         else:
             self.xV = 0
-            self.yV = 0
+            # self.yV = 0
     
     def collision_Wall(self,size):
             if self.x - (self.w) < 0:
@@ -69,11 +71,12 @@ class Player:
                 self.y -= var
     
     def collision_Player(self,wall,tp):
+        global collision
+        collision = {'top': False, 'bottom': False,'right': False,'left': False}
         if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h and tp == True:
             tp_mode()
        
         if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h and tp == False:
-            collision = {'top': False, 'bottom': False,'right': False,'left': False}
             if self.y + self.h > wall.y and self.y < wall.y:
                 collision['top'] = True
             elif self.y < wall.y + wall.h and self.y + self.h > wall.y + wall.h + self.h/2:
@@ -84,23 +87,24 @@ class Player:
                 collision['right'] = True
             
 
-            if self.xV >= 0 and collision['left']:
+            if self.xV > 0 and collision['left']:
                 self.xV = 0
                 var = self.x + (self.w) - wall.x
                 self.x -= var               
-            elif self.xV <= 0 and collision['right']:
+            elif self.xV < 0 and collision['right']:
                 self.xV = 0
                 var = self.x - (wall.x + wall.w)
                 self.x -= var 
-            if self.yV <= 0 and collision['bottom']:
+            if self.yV < 0 and collision['bottom']:
                 var = self.y - (wall.y + wall.h)
                 self.y -= var
                 self.yV = 0
-            elif self.yV >= 0 and collision['top']:
+            elif self.yV > 0 and collision['top']:
                 var = self.y + self.h - wall.y
                 self.y -= var
                 self.yV = 0
             print(collision)
+            
         
 class Obj:
     def __init__(self,x,y,w,h):
@@ -168,11 +172,11 @@ size = (1000, 800)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("My Game")
 player = Player(size[0]/2,size[1]/2,20,20)
-# make_obj(100,00,50,1000)
-# make_obj(900,00,50,1000)
-make_obj(0,750,1000,100)
-# make_obj(0,200,1000,50)
-make_obj(500,400,200,200)
+make_obj(700,650,200,30)
+make_obj(600,450,200,30)
+make_obj(-1000,750,3000,100)
+make_obj(200,550,200,30)
+
 # for i in range(0,10):
 #     make_obj(random.randint(50,750),random.randint(50,750),random.randint(10,100),random.randint(10,100))
 done = False
@@ -187,10 +191,13 @@ while not done:
     done == actionDetection()  # Flag that we are done so we exit this loop   
     # --- Game logic should go here
     # print(player.x,player.xV,player.y,player.yV)
-    player.movement(w_pressed,a_pressed,s_pressed,d_pressed)
+    player.movement(w_pressed,a_pressed,s_pressed,d_pressed,space_pressed)
     player.x += player.xV
     player.y += player.yV
-
+    if collision['top'] == False:
+        player.yV += gravity
+    
+    print(player.yV)
     for item in objectarray:
         # item.collision_Wall(size)
         player.collision_Player(item,tp)
