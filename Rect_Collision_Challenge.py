@@ -176,7 +176,7 @@ make_obj(500,400,200,200)
 for i in range(0,10):
     make_obj(random.randint(50,750),random.randint(50,750),random.randint(10,100),random.randint(10,100))
 done = False
-tp = False
+tp = True
 
 clock = pygame.time.Clock()
 # -------- Main Program Loop -----------
