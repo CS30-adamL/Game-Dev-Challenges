@@ -98,13 +98,13 @@ class Player:
                 collision['left'] = True
             
 
-            if self.xV > 0 and collision['right']:
+            if self.xV >= 0 and collision['right']:
                 # self.xV = 0
                 for obj in objectarray:
                     obj.xV = 0
                 var = self.x + (self.w) - wall.x
                 self.x -= var               
-            elif self.xV < 0 and collision['left']:
+            elif self.xV <= 0 and collision['left']:
                 # self.xV = 0
                 for obj in objectarray:
                     obj.xV = 0
@@ -201,8 +201,9 @@ for i in range(-2500,2500,100):
         abs(k)
     make_obj(700 +i ,650-abs(k*2),200,30)
     make_obj(600+i,450-abs(k*2),200,30)
-    make_obj(-1000,750,3000,100)
     make_obj(200+i,550-abs(k*2),200,30)
+make_obj(-1000,750,3000,100)
+make_obj(800,650,300,100)
 # for i in range(0,10):
     # make_obj(random.randint(50,750),random.randint(50,750),random.randint(10,100),random.randint(10,100))
 done = False
