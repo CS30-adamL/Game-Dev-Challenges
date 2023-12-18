@@ -211,16 +211,3 @@ while not done:
  
 # Close the window and quit.
 pygame.quit()
-
-
-#  for item in objectarray:
-#         for bullet in bulletarray:
-#             if bullet.miss == True:
-#                 bulletarray.pop(bulletarray.index(bullet))
-#             if bullet.hit == True:
-#                 bulletarray.pop(bulletarray.index(bullet))
-#             bullet.movement()                
-#             bullet.bullet_hit(item)
-#         if item.hit == "dead":
-#             dead_food = objectarray.pop(objectarray.index(item))
-#         item.collision(size)
