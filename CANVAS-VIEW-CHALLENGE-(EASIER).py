@@ -1,276 +1,153 @@
-
-
 import pygame
-import math
-# Define some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-
-
 import random
+num = 0
+def main():
+    # pygame setup
+    pygame.init()
+    screen = pygame.display.set_mode((1000, 1000))
+    clock = pygame.time.Clock()
+    running = True
+    dt = 0
 
-w_pressed = False
-a_pressed = False
-s_pressed = False
-d_pressed = False
-space_pressed = False
-objectarray = []
-gravity = .1
-obj_num = 30
-collision = {'top': False, 'bottom': False,'right': False,'left': False}
-# Making objects
-def make_obj(x,y,w,h):
-        num = Obj(x,y,w,h)
-        objectarray.append(num)
+    # Game Variables
+    walls = makeWalls(250)
+    player= Player("green",500,500,30,30,"player")
+
+    # or not playerx + player.W > wall.X,  if not playerx < wall.X + wall.W
+    while running:
+        # poll for events
+        # pygame.QUIT event means the user clicked X to close your window
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    player.jump()
+
+        # LOGIC
+        player.update(walls)
+
+        # DRAWING
+        screen.fill("white")
+
+        for rc in walls:
+            rc.draw(screen,player.X,player.Y)
+       
+        player.draw(screen)
+     
+
+        pygame.display.flip()
+        dt = clock.tick(60) / 1000
+
+
+    pygame.quit()
+
+
+
+class Wall:
+    def __init__(self,color,Xlocation,Ylocation,width,length,type):
+        self.color = color
+        self.X = Xlocation
+        self.Y = Ylocation
+        self.W = width
+        self.H = length
+        self.type = type
+   
+    def draw(self, screen,playerx,playery):
+        viewx = playerx - 500
+        viewy = playery -500
+
+        pygame.draw.rect(screen,self.color,[self.X - viewx,self.Y - viewy,self.W,self.H])
+
 
 class Player:
-    def __init__(self,x,y,w,h):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        self.xV = 5
-        self.yV = 0
-        self.hitting = False
-    
-    def movement(self,w,a,s,d,space):
-        # print(w,a,s,d,self.xV,self.yV)
-        print(collision,self.yV)
-        if w or a or s or d or space == True: 
-            if a == True and d == False:
-                for obj in objectarray:
-                    obj.xV = 5
-                    player.collision_Player(obj,tp)
-                # self.xV = -5
-            elif a == False and d == True:
-                for obj in objectarray:
-                    obj.xV = -5
-                    player.collision_Player(obj,tp)
-                # self.xV = 5
-            else:
-                for obj in objectarray:
-                    obj.xV = 0
-                    player.collision_Player(obj,tp)
-                # self.xV = 0
-            if space == True and collision['bottom'] == True:
-                for obj in objectarray:
-                    obj.yV += 5
-                    player.collision_Player(obj,tp)
-                # self.yV -= 5
-            # if w == True and s == False:
-            #     self.yV = -5
-            # elif w == False and s == True:
-            #     self.yV = 5
-            # else:
-            #     self.yV = 0
-        else:
-            for obj in objectarray:
-                    obj.xV = 0
-                    player.collision_Player(obj,tp)
-            self.xV = 0
-            # self.yV = 0
-    
-    def collision_Wall(self,size):
-            if self.x - (self.w) < 0:
-                var = self.x - (self.w)
-                self.x -= var
-            elif self.x  > size[0]:
-                var = self.x - size[0]
-                self.x -= var
-            if self.y - (self.h) < 0:
-                var = self.y - (self.h)
-                self.y -= var
-            elif self.y > size[1]:
-                var = self.y - size[1]
-                self.y -= var
-    
-    def collision_Player(self,wall,tp):
-        global collision
-        collision = {'top': False, 'bottom': False,'right': False,'left': False}
-        if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) > wall.y and self.y < wall.y + wall.h and tp == True:
-            tp_mode()
-        else:
-            # if self.x + (self.w) > wall.x and self.x < wall.x + wall.w and self.y + (self.h) >= wall.y and self.y < wall.y + wall.h and tp == False:
-            if self.y + self.h > wall.y:
-                collision['bottom'] = True
-            if self.y < wall.y + wall.h :
-                collision['top'] = True
-            if self.x + self.w > wall.x:
-                collision['right'] = True
-            if self.x < wall.x + wall.w:
-                collision['left'] = True
-            
-
-            if collision['right']:
-                # self.xV = 0
-                var = self.x + (self.w) - wall.x
-                # var = wall.x - self.x +(self.w)
-                self.x -= var    
-                for obj in objectarray:
-                    obj.xV = 0
-                    # obj.x -= var/100000
-                    # obj.x += (var +obj.w)
-                           
-        #     if collision['left'] and collision['right'] == False and collision['bottom'] == False:
-        #         # self.xV = 0
-        #         var = self.x - (wall.x + wall.w)
-        #         # self.x -= var 
-        #         for obj in objectarray:
-        #             obj.xV = 0
-        #             obj.x += var
-                
-        #     if collision['top'] and collision['bottom'] == False:
-        #         var = self.y - (wall.y + wall.h)
-        #         # self.y -= var
-        #         # self.yV = 0
-        #         for obj in objectarray:
-        #             obj.yV = 0
-        #             obj.y += var
-        #     if collision['bottom'] and collision['top'] == False:
-        #         var = self.y + self.h - wall.y
-        #         # self.y -= var
-        #         for obj in objectarray:
-        #             obj.yV = 0
-        #             obj.y += var
-        #         # self.yV = 0
-        #     if collision['bottom'] == False:
-        #         for obj in objectarray:
-        #             obj.yV -= gravity
-
-
-                # print(collision)
-                
-        
-class Obj:
-    def __init__(self,x,y,w,h):
-        self.x = x 
-        self.y = y
-        self.w = w
-        self.h = h
-        self.yV = 0
-        self.xV = 0
-        self.hitting = False
-        print(f"Obj Created: x:{self.x} y: {self.y} w: {self.w} h: {self.h}\n")
-
-
-    def collision_Wall(self,size):
-            if self.x - (self.w) < 0:
-                var = self.x - (self.w)
-                self.x -= var
-            elif self.x  > size[0]:
-                var = self.x - size[0]
-                self.x -= var
-            if self.y - (self.h) < 0:
-                var = self.y - (self.h)
-                self.y -= var
-            elif self.y > size[1]:
-                var = self.y - size[1]
-                self.y -= var
-    
-
-def tp_mode():
-    player.x = 0
-    player.y = 0
-
-def actionDetection():
-    global w_pressed,a_pressed,s_pressed,d_pressed,space_pressed
-    for event in pygame.event.get(): # User did something
-        if event.type == pygame.QUIT: # If user clicked close
-            print("User asked to quit.")
-            pygame.quit()
-            return True
-        elif event.type == pygame.KEYDOWN:
-            if pygame.key.name(event.key) == "w":
-                w_pressed = True
-            if pygame.key.name(event.key) == "a":
-                a_pressed = True
-            if pygame.key.name(event.key) == "s":
-                s_pressed = True
-            if pygame.key.name(event.key) == "d":
-                d_pressed = True
-            if pygame.key.name(event.key) == "space":
-                space_pressed = True
-            print("User pressed a key.")
-        elif event.type == pygame.KEYUP:
-            if pygame.key.name(event.key) == "w":
-                w_pressed = False
-            if pygame.key.name(event.key) == "a":
-                a_pressed = False
-            if pygame.key.name(event.key) == "s":
-                s_pressed = False
-            if pygame.key.name(event.key) == "d":
-                d_pressed = False
-            if pygame.key.name(event.key) == "space":
-                space_pressed = False
-            print("User let go of a key.")
-
-pygame.init()
-size = (1000, 800)
-screen = pygame.display.set_mode(size)
-pygame.display.set_caption("My Game")
-player = Player(size[0]/2,size[1]/2,20,20)
-for i in range(-2500,2500,100):
-    k = i
-    if k > 400 or k < -400:
-        abs(k)
-    make_obj(700 +i ,650-abs(k*2),200,30)
-    make_obj(600+i,450-abs(k*2),200,30)
-    make_obj(200+i,550-abs(k*2),200,30)
-make_obj(-1000,750,3000,100)
-make_obj(800,650,300,100)
-# for i in range(0,10):
-    # make_obj(random.randint(50,750),random.randint(50,750),random.randint(10,100),random.randint(10,100))
-done = False
-tp = False
-
-clock = pygame.time.Clock()
-# -------- Main Program Loop -----------
-while not done:
-
-
-    # --- Main event loop
-    done == actionDetection()  # Flag that we are done so we exit this loop   
-    # --- Game logic should go here
-    # print(player.x,player.xV,player.y,player.yV)
-    # player.x += player.xV
-    # player.y += player.yV
-    player.movement(w_pressed,a_pressed,s_pressed,d_pressed,space_pressed)
-    for obj in objectarray:
-        obj.x += obj.xV
-        obj.y += obj.yV
-    # happen = False
-    # for item in objectarray:
-        # player.collision_Player(item,tp)
-        # if collision['bottom'] == True:
-        #     current_collision = objectarray.index(item)
-        #     happen = True
-        # player.collision_Wall(size)
-    # if happen == True:
-    #     collision = player.collision_Player(objectarray[current_collision],tp) 
-    # player.movement(w_pressed,a_pressed,s_pressed,d_pressed,space_pressed)
-    player.collision_Wall(size)
+    def __init__(self,color,Xlocation,Ylocation,width,length,type):
+        self.color = color
+        self.X = Xlocation
+        self.Y = Ylocation
+        self.W = width
+        self.H = length
+        self.dx = 5
+        self.dy = 0
+        self.gravity = 0.4
+        self.launchSpeed = -16
+        self.type = type
+        self.dir = "right"
    
-        # player.yV += gravity
-    
-    
-        
-    # --- Screen-clearing code goes here
-    screen.fill(WHITE)
+    def jump(self):
+        if self.dy == 0:
+            self.dy = self.launchSpeed
 
-    # --- Drawing code should go here
-    for item in objectarray:
-            pygame.draw.rect(screen,RED,[item.x, item.y,(item.w),(item.h)],0)
-    pygame.draw.rect(screen,BLACK,[player.x,player.y,player.w,player.h],0)
+    def update(self, walls):
+        # Horizontal Movement
+        keys = pygame.key.get_pressed()        
+        if keys[pygame.K_a]:
+            self.X += -self.dx
+       
+            self.dir = "left"
+            self.runCollision(walls)
+        elif keys[pygame.K_d]:
+            self.X += self.dx
+       
+            self.dir = "right"
+            self.runCollision(walls)
+       
+        # Vertical Movement
+        self.dy += self.gravity
+        self.Y += self.dy
+        if self.dy > 0:
+            self.dir = "down"
+        elif self.dy < 0:
+            self.dir = "up"
+        self.runCollision(walls)
    
-    # --- Go ahead and update the screen with what we've drawn.
-    pygame.display.flip()
+    def runCollision(self, walls):
+        for wall in walls:
+            if (rectCollide(self, wall)):
+                if self.dir == "down":
+                    # Moving down
+                    self.Y = wall.Y - self.H
+                    self.dy = 0
+                elif self.dir == "up":
+                    self.Y = wall.Y + wall.H
+                    self.dy = 0
+                elif self.dir == "left" :
+                    self.X = wall.X + wall.W
+                elif self.dir == "right" :
+                    self.X = wall.X - self.W
+           
+    def draw(self, screen):
+        viewx = self.X - 500
+        viewy = self.Y -500
+        pygame.draw.rect(screen,self.color,[self.X - viewx ,self.Y- viewy,self.W,self.H])
+   
+
+   
+def rectCollide(rect1, rect2) :
  
-    # --- Limit to 60 frames per second
-    clock.tick(60)
- 
-# Close the window and quit.
-pygame.quit()
+  return (
+    rect1.X < rect2.X + rect2.W and
+    rect1.X + rect1.W > rect2.X and
+    rect1.Y + rect1.H > rect2.Y and
+    rect1.Y < rect2.Y + rect2.H
+  )
 
 
+   
+
+def makeWalls(num_walls):
+    temp = []
+    i = 0
+    while i < num_walls:
+        xlocation = random.randint(-1000,1500)
+        ylocation = random.randint(-5000,1000)
+        width = random.randint(40,60)
+        height = random.randint(50,80)
+        temp.append(Wall("red",xlocation,ylocation,width,height,"rect"))
+        i+=1
+    temp.append(Wall("black", 0, 900, 1000, 100, "rect"))
+    return temp
+
+
+# Call main to begin program
+main()
