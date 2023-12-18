@@ -9,6 +9,11 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 
+# make true for the easier version
+tp = False
+
+
+
 import random
 
 w_pressed = False
@@ -167,7 +172,7 @@ pygame.init()
 size = (1000, 800)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("My Game")
-player = Player(size[0]/2,size[1]/2,20,20)
+player = Player(0,0,20,20)
 # make_obj(100,00,50,1000)
 # make_obj(900,00,50,1000)
 make_obj(0,750,1000,100)
@@ -176,7 +181,7 @@ make_obj(500,400,200,200)
 for i in range(0,10):
     make_obj(random.randint(50,750),random.randint(50,750),random.randint(10,100),random.randint(10,100))
 done = False
-tp = True
+
 
 clock = pygame.time.Clock()
 # -------- Main Program Loop -----------
